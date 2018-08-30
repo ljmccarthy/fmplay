@@ -1,0 +1,8 @@
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+.ninja*
+*.ninja
+.vscode/settings.json
+.vscode/tags
+out/
