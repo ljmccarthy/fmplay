@@ -50,12 +50,12 @@ SDL_AudioDeviceID
 open_audio_device(int freq, SDL_AudioCallback callback, void *userdata)
 {
     SDL_AudioSpec desired = {
-        freq: freq,
-        format: AUDIO_F32,
-        channels: 1,
-        samples: 4096,
-        callback: callback,
-        userdata: userdata,
+        .freq = freq,
+        .format = AUDIO_F32,
+        .channels = 1,
+        .samples = 4096,
+        .callback = callback,
+        .userdata = userdata,
     }, obtained = {};
 
     SDL_AudioDeviceID device = SDL_OpenAudioDevice(nullptr, 0, &desired, &obtained, 0);
