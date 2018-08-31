@@ -7,14 +7,16 @@
 /*  - added stereo buffer support (define #BLIP_MONO to disable)    */
 /*  - added inverted stereo output (define #BLIP_INVERT to enable)*/
 
-#include "blip_buf.h"
+#include "blip_buf.hpp"
 
 #ifdef BLIP_ASSERT
-#include <assert.h>
+#include <cassert>
 #endif
-#include <limits.h>
-#include <string.h>
-#include <stdlib.h>
+#include <climits>
+#include <cstring>
+#include <cstdlib>
+
+t_snd snd;
 
 /* Library Copyright (C) 2003-2009 Shay Green. This library is free software;
 you can redistribute it and/or modify it under the terms of the GNU Lesser

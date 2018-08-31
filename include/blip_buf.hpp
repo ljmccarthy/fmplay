@@ -4,10 +4,6 @@
 #ifndef BLIP_BUF_H 
 #define BLIP_BUF_H
 
-#ifdef __cplusplus
-	extern "C" {
-#endif
-
 /** First parameter of most functions is blip_t*, or const blip_t* if nothing
 is changed. */
 typedef struct blip_t blip_t;
@@ -74,12 +70,14 @@ int blip_mix_samples( blip_t* m1, blip_t* m2, blip_t* m3, short out [], int coun
 /** Frees buffer. No effect if NULL is passed. */
 void blip_delete( blip_t* );
 
+typedef struct
+{
+  int sample_rate;      /* Output Sample rate (8000-48000) */
+  double frame_rate;    /* Output Frame rate (usually 50 or 60 frames per second) */
+  int enabled;          /* 1= sound emulation is enabled */
+  blip_t* blips[3];     /* Blip Buffer resampling (stereo) */
+} t_snd;
 
-/* Deprecated */
-typedef blip_t blip_buffer_t;
-
-#ifdef __cplusplus
-	}
-#endif
+extern t_snd snd;
 
 #endif
