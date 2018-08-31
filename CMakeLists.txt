@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 project(fmplay)
 
 set(CMAKE_CXX_COMPILER "${PROJECT_SOURCE_DIR}/scripts/llvm-clang++")
-set(CMAKE_CXX_FLAGS "-std=c++17 -fwrapv -fstrict-aliasing -fvisibility=hidden -fvisibility-inlines-hidden -Wall")
+set(CMAKE_CXX_FLAGS "-std=c++17 -fno-strict-overflow -fno-strict-aliasing -fvisibility=hidden -fvisibility-inlines-hidden -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "-Os -fomit-frame-pointer -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D_DEBUG")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-Wl,--strip-all -Wl,--gc-sections")
