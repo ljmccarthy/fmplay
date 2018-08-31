@@ -1,0 +1,7 @@
+#!/bin/sh
+for arg in "$@"; do
+	if [ "$arg" = "-c" ]; then
+		exec clang++ -emit-llvm "$@"
+	fi
+done
+exec clang++ -fuse-ld=lld "$@"
