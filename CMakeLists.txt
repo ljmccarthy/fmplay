@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 project(fmplay)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-Os -fomit-frame-pointer -fwrapv -fstrict-aliasing -fvisibility=hidden -fvisibility-inlines-hidden")
+set(CMAKE_CXX_FLAGS "-Os -fomit-frame-pointer -fwrapv -fstrict-aliasing -fvisibility=hidden -fvisibility-inlines-hidden -Wall")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
