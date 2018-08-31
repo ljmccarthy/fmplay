@@ -8,7 +8,7 @@ static constexpr uint32_t note_freqs[] = {
 class Synth : noncopyable {
 public:
     void fill_audio_buffer(uint32_t *buffer, size_t len);
-    static void sdl_audio_callback(void *userdata, Uint8 *stream_bytes, int len);
+    static void sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len);
 
 private:
     uint32_t count = 0;
@@ -39,7 +39,7 @@ Synth::fill_audio_buffer(uint32_t *buffer, size_t len)
 }
 
 void
-Synth::sdl_audio_callback(void *userdata, Uint8 *stream_bytes, int len)
+Synth::sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
 {
     auto synth = reinterpret_cast<Synth *>(userdata);
     auto buffer = reinterpret_cast<uint32_t *>(stream_bytes);
