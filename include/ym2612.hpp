@@ -16,6 +16,9 @@
 #ifndef _H_YM2612_
 #define _H_YM2612_
 
+#include <cstdint>
+#include "sample_formats.hpp"
+
 enum {
   YM2612_DISCRETE = 0,
   YM2612_INTEGRATED,
@@ -25,10 +28,8 @@ enum {
 extern void YM2612Init(void);
 extern void YM2612Config(int type);
 extern void YM2612ResetChip(void);
-extern void YM2612Update(int *buffer, int length);
+extern void YM2612Update(stereo<int16_t> *buffer, int length);
 extern void YM2612Write(unsigned int a, unsigned int v);
 extern unsigned int YM2612Read(void);
-extern int YM2612LoadContext(unsigned char *state);
-extern int YM2612SaveContext(unsigned char *state);
 
 #endif /* _YM2612_ */

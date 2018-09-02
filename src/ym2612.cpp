@@ -2003,7 +2003,7 @@ unsigned int YM2612Read(void)
 }
 
 /* Generate samples for ym2612 */
-void YM2612Update(int *buffer, int length)
+void YM2612Update(stereo<int16_t> *buffer, int length)
 {
   int i;
   int lt,rt;
@@ -2131,8 +2131,9 @@ void YM2612Update(int *buffer, int length)
     }
 
     /* buffering */
-    *buffer++ = lt;
-    *buffer++ = rt;
+    buffer->l = lt;
+    buffer->r = rt;
+    buffer++;
 
     /* CSM mode: if CSM Key ON has occurred, CSM Key OFF need to be sent      */
     /* only if Timer A does not overflow again (i.e CSM Key ON not set again) */

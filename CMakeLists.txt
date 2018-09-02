@@ -12,12 +12,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
-file(GLOB fmplay_SRC "src/*.cpp")
-add_executable(fmplay ${fmplay_SRC})
+set(FMPLAY_SRC "${PROJECT_SOURCE_DIR}/src")
+set(FMPLAY_INC "${PROJECT_SOURCE_DIR}/include")
+
+file(GLOB FMPLAY_SRCFILES "${FMPLAY_SRC}/*.cpp")
+add_executable(fmplay ${FMPLAY_SRCFILES})
 
 find_package(SDL2 REQUIRED)
-target_include_directories(fmplay PRIVATE "${PROJECT_SOURCE_DIR}/include" )
+target_include_directories(fmplay PRIVATE "${FMPLAY_INC}")
 target_link_libraries(fmplay SDL2::SDL2 SDL2::SDL2main)
+
+add_executable(test_vgmplayer "${FMPLAY_SRC}/vgmplayer.cpp" "${FMPLAY_SRC}/read_file.cpp")
+target_compile_definitions(test_vgmplayer PRIVATE UNIT_TEST)
+target_include_directories(test_vgmplayer PRIVATE "${FMPLAY_INC}")
 
 if(0)
     get_cmake_property(_variableNames VARIABLES)

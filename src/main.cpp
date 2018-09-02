@@ -1,49 +1,27 @@
+#include <iostream>
 #include <SDL.h>
-#include "util.hpp"
+#include "vgmplayer.hpp"
 
-static constexpr uint32_t note_freqs[] = {
-    169, 159, 150, 142, 134, 126, 119, 113, 106, 100, 95, 89,
-};
+static SDL_AudioDeviceID device;
 
-class Synth : noncopyable {
-public:
-    void fill_audio_buffer(uint32_t *buffer, size_t len);
-    static void sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len);
-
-private:
-    uint32_t count = 0;
-    uint32_t sample = 0;
-    int note = 0;
-    int note_dir = 1;
-};
-
-void
-Synth::fill_audio_buffer(uint32_t *buffer, size_t len)
+static void
+sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
 {
-    int nr_samples = len / 4;
-    uint32_t note_freq = note_freqs[note];
-
-    for (int i = 0; i < nr_samples; i++) {
-        if (++count % note_freq == 0) {
-            sample = sample ? 0 : UINT32_MAX;
-        }
-        if (count % 3000 == 0) {
-            note += note_dir;
-            if (note == 0 || note == array_size(note_freqs) - 1) {
-                note_dir = -note_dir;
-            }
-            note_freq = note_freqs[note];
-        }
-        buffer[i] = sample;
+    uint32_t num_samples = len / 4;
+    auto player = reinterpret_cast<VgmPlayer *>(userdata);
+    auto sample_buffer = reinterpret_cast<stereo<int16_t> *>(stream_bytes);
+    bool more;
+    try {
+        more = player->play(sample_buffer, num_samples);
+    } catch (const std::exception& e) {
+        std::cerr << "error: " << e.what() << std::endl;
+        more = false;
     }
-}
-
-void
-Synth::sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
-{
-    auto synth = reinterpret_cast<Synth *>(userdata);
-    auto buffer = reinterpret_cast<uint32_t *>(stream_bytes);
-    synth->fill_audio_buffer(buffer, len);
+    if (!more) {
+        SDL_LockAudioDevice(device);
+        SDL_PauseAudioDevice(device, 1);
+        SDL_UnlockAudioDevice(device);
+    }
 }
 
 SDL_AudioDeviceID
@@ -51,8 +29,8 @@ open_audio_device(int freq, SDL_AudioCallback callback, void *userdata)
 {
     SDL_AudioSpec desired = {
         .freq = freq,
-        .format = AUDIO_F32,
-        .channels = 1,
+        .format = AUDIO_S16SYS,
+        .channels = 2,
         .samples = 4096,
         .callback = callback,
         .userdata = userdata,
@@ -70,15 +48,28 @@ open_audio_device(int freq, SDL_AudioCallback callback, void *userdata)
     return device;
 }
 
+static void
+play_vgm(const char *filename)
+{
+    VgmPlayer player(filename);
+    device = open_audio_device(44100, sdl_audio_callback, &player);
+    SDL_LockAudioDevice(device);
+    SDL_PauseAudioDevice(device, 0);
+    while (SDL_GetAudioDeviceStatus(device) == SDL_AUDIO_PLAYING) {
+        SDL_UnlockAudioDevice(device);
+        SDL_Delay(100);
+        SDL_LockAudioDevice(device);
+    }
+}
+
 int
 main(const int argc, const char *const *argv)
 {
+    if (argc != 2) {
+        return 1;
+    }
     SDL_Init(SDL_INIT_AUDIO);
-    Synth synth;
-    SDL_AudioDeviceID device = open_audio_device(44100, &Synth::sdl_audio_callback, &synth);
-    SDL_PauseAudioDevice(device, 0);
-    SDL_Delay(10000);
-    SDL_CloseAudioDevice(device);
+    play_vgm(argv[1]);
     SDL_Quit();
     return 0;
 }
