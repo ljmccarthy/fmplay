@@ -44,9 +44,10 @@ VgmPlayer::VgmPlayer(const char *filename)
     ym2612_clock = parse_uint32_le(&vgm_data[0x2C]);
     vgm_end = vgm_data.size();
     play_pos = vgm_offset;
-    pcm_pos = 0;
-    pcm_end = 0;
     wait_pending = 0;
+    pcm_pos = 0;
+    pcm_pending = 0;
+    pcm_sample = 0;
 
 #ifndef UNIT_TEST
     psg_init(PSG_DISCRETE);
@@ -69,11 +70,12 @@ VgmPlayer::play(stereo<int16_t> *out, uint32_t num_samples)
             }
             process_command();
         }
-        while (pcm_pos < pcm_end && out < end) {
+        while (pcm_pending && out < end) {
             YM2612Write(0, 0x2A);
-            YM2612Write(1, data_bank[pcm_pos++]);
+            YM2612Write(1, pcm_sample);
             YM2612Update(out, 1);
             out++;
+            pcm_pending--;
             wait_pending--;
         }
         uint32_t wait_now = std::min<uint32_t>(wait_pending, end - out);
@@ -137,7 +139,9 @@ VgmPlayer::process_command()
             }
             uint32_t size = parse_uint32_le(&vgm_data[play_pos]);
             play_pos += 4;
+            fprintf(stderr, "appending %u bytes to data bank (%zu)\n", size, data_bank.size());
             data_bank.insert(data_bank.end(), &vgm_data[play_pos], &vgm_data[play_pos + size]);
+            fprintf(stderr, "data bank size after append: %zu\n", data_bank.size());
             play_pos += size;
             break;
         }
@@ -147,7 +151,7 @@ VgmPlayer::process_command()
             if (seek_to >= data_bank.size()) {
                 throw std::runtime_error("PCM data bank seek out of range");
             }
-            pcm_pos = pcm_end = seek_to;
+            pcm_pos = seek_to;
             break;
         }
         default: {
@@ -156,12 +160,12 @@ VgmPlayer::process_command()
                     wait_pending = (cmd & 0x0F) + 1;
                     break;
                 case 0x80:
-                    pcm_end = pcm_pos + (cmd & 0x0F);
-                    if (pcm_pos >= data_bank.size() || pcm_end > data_bank.size() || pcm_end < pcm_pos) {
-                        //throw std::runtime_error("PCM data bank seek out of range");
-                        pcm_end = pcm_pos;
+                    pcm_pending = cmd & 0x0F;
+                    wait_pending = pcm_pending;
+                    if (pcm_pos >= data_bank.size()) {
+                        throw std::runtime_error("PCM data bank seek out of range");
                     }
-                    wait_pending = pcm_end - pcm_pos;
+                    pcm_sample = data_bank[pcm_pos++];
                     break;
                 default:
                     fprintf(stderr, "unrecognised VGM command %02x\n", cmd);
