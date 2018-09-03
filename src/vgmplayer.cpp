@@ -57,9 +57,8 @@ VgmPlayer::VgmPlayer(const char *filename)
 }
 
 bool
-VgmPlayer::play(stereo<int16_t> *out, uint32_t num_samples)
+VgmPlayer::play(stereo<int16_t> *out, stereo<int16_t> *end)
 {
-    stereo<int16_t> *end = out + num_samples;
     while (true) {
         while (!wait_pending) {
             if (play_pos >= vgm_end) {

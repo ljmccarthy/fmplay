@@ -7,12 +7,11 @@ static SDL_AudioDeviceID device;
 static void
 sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
 {
-    uint32_t num_samples = len / 4;
     auto player = reinterpret_cast<VgmPlayer *>(userdata);
-    auto sample_buffer = reinterpret_cast<stereo<int16_t> *>(stream_bytes);
+    auto buffer = reinterpret_cast<stereo<int16_t> *>(stream_bytes);
     bool more;
     try {
-        more = player->play(sample_buffer, num_samples);
+        more = player->play(buffer, buffer + len / 4);
     } catch (const std::exception& e) {
         std::cerr << "error: " << e.what() << std::endl;
         more = false;

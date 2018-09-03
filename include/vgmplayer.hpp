@@ -9,7 +9,7 @@ class VgmPlayer
 {
 public:
     explicit VgmPlayer(const char *filename);
-    bool play(stereo<int16_t> *out, uint32_t num_samples);
+    bool play(stereo<int16_t> *out, stereo<int16_t> *end);
 
 private:
     void process_command();
