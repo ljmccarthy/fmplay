@@ -22,8 +22,6 @@ private:
     uint32_t play_pos;
     uint32_t wait_pending;
     uint32_t pcm_pos;
-    uint16_t pcm_pending;
-    uint16_t pcm_sample;
 };
 
 #endif // vgmplayer_hpp_included__
