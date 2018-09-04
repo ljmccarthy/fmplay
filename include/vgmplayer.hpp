@@ -8,8 +8,10 @@
 class VgmPlayer
 {
 public:
+    using sample_t = stereo<int16_t>;
+
     explicit VgmPlayer(const char *filename);
-    bool play(stereo<int16_t> *out, stereo<int16_t> *end);
+    bool play(sample_t *out, sample_t *end);
 
 private:
     void process_command();
