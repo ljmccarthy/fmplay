@@ -47,13 +47,11 @@ VgmPlayer::VgmPlayer(const char *filename)
     wait_pending = 0;
     pcm_pos = 0;
 
-#ifndef UNIT_TEST
     psg_init(PSG_DISCRETE);
     psg_reset();
     YM2612Init();
     YM2612Config(YM2612_ENHANCED);
     YM2612ResetChip();
-#endif // UNIT_TEST
 }
 
 bool
@@ -161,16 +159,3 @@ VgmPlayer::process_command()
         }
     }
 }
-
-#ifdef UNIT_TEST
-#include <iostream>
-
-int main()
-{
-    {
-        VgmPlayer player("test.vgm");
-    }
-    std::cout << "OK" << std::endl;
-    return 0;
-}
-#endif // UNIT_TEST

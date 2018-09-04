@@ -3,6 +3,7 @@
 #include "vgmplayer.hpp"
 
 static SDL_AudioDeviceID device;
+static int retcode = 0;
 
 static void
 sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
@@ -15,6 +16,7 @@ sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
     } catch (const std::exception& e) {
         std::cerr << "error: " << e.what() << std::endl;
         more = false;
+        retcode = 1;
     }
     if (!more) {
         SDL_LockAudioDevice(device);
@@ -65,10 +67,16 @@ int
 main(const int argc, const char *const *argv)
 {
     if (argc != 2) {
+        std::cerr << "usage: " << argv[0] << " FILE.vgm" << std::endl;
         return 1;
     }
     SDL_Init(SDL_INIT_AUDIO);
-    play_vgm(argv[1]);
+    try {
+        play_vgm(argv[1]);
+    } catch (const std::exception& e) {
+        std::cerr << "error: " << e.what() << std::endl;
+        retcode = 1;
+    }
     SDL_Quit();
-    return 0;
+    return retcode;
 }
