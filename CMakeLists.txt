@@ -24,6 +24,9 @@ add_executable(fmplay ${FMPLAY_APP_SRCFILES} ${FMPLAY_SRCFILES})
 target_include_directories(fmplay PRIVATE "${FMPLAY_INC}")
 target_link_libraries(fmplay SDL2::SDL2 SDL2::SDL2main)
 
+add_executable(vgm2samples "${FMPLAY_SRC}/tests/vgm2samples.cpp" ${FMPLAY_SRCFILES})
+target_include_directories(vgm2samples PRIVATE "${FMPLAY_INC}")
+
 add_executable(test_vgmplayer "${FMPLAY_SRC}/tests/test_vgmplayer.cpp" ${FMPLAY_SRCFILES})
 target_include_directories(test_vgmplayer PRIVATE "${FMPLAY_INC}")
 
