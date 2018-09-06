@@ -44,6 +44,8 @@
 #include "blip_buf.hpp"
 #include "psg.hpp"
 
+static blip_t* blips[3];
+
 /* internal clock = input clock : 16 = (master clock : 15) : 16 */
 #define PSG_MCYCLES_RATIO (15*16)
 
@@ -387,11 +389,11 @@ static void psg_update(unsigned int clocks)
       /* update channel output */
       if (PSG_HQ)
       {
-        blip_add_delta(snd.blips[0], psg.clocks, psg.chanDelta[i][0], psg.chanDelta[i][1]);
+        blip_add_delta(blips[0], psg.clocks, psg.chanDelta[i][0], psg.chanDelta[i][1]);
       }
       else
       {
-        blip_add_delta_fast(snd.blips[0], psg.clocks, psg.chanDelta[i][0], psg.chanDelta[i][1]);
+        blip_add_delta_fast(blips[0], psg.clocks, psg.chanDelta[i][0], psg.chanDelta[i][1]);
       }
 
       /* clear pending channel volume variations */
@@ -417,11 +419,11 @@ static void psg_update(unsigned int clocks)
         /* update channel output */
         if (PSG_HQ)
         {
-          blip_add_delta(snd.blips[0], timestamp, polarity*psg.chanOut[i][0], polarity*psg.chanOut[i][1]);
+          blip_add_delta(blips[0], timestamp, polarity*psg.chanOut[i][0], polarity*psg.chanOut[i][1]);
         }
         else
         {
-          blip_add_delta_fast(snd.blips[0], timestamp, polarity*psg.chanOut[i][0], polarity*psg.chanOut[i][1]);
+          blip_add_delta_fast(blips[0], timestamp, polarity*psg.chanOut[i][0], polarity*psg.chanOut[i][1]);
         }
 
         /* timestamp of next transition */
@@ -467,11 +469,11 @@ static void psg_update(unsigned int clocks)
           /* update noise channel output */
           if (PSG_HQ)
           {
-            blip_add_delta(snd.blips[0], timestamp, shiftOutput*psg.chanOut[3][0], shiftOutput*psg.chanOut[3][1]);
+            blip_add_delta(blips[0], timestamp, shiftOutput*psg.chanOut[3][0], shiftOutput*psg.chanOut[3][1]);
           }
           else
           {
-            blip_add_delta_fast(snd.blips[0], timestamp, shiftOutput*psg.chanOut[3][0], shiftOutput*psg.chanOut[3][1]);
+            blip_add_delta_fast(blips[0], timestamp, shiftOutput*psg.chanOut[3][0], shiftOutput*psg.chanOut[3][1]);
           }
         }
 
