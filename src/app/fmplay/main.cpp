@@ -12,7 +12,7 @@ sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
     auto buffer = reinterpret_cast<typename VgmPlayer::sample_t *>(stream_bytes);
     bool more;
     try {
-        more = player->play(buffer, buffer + len / 4);
+        more = player->play(buffer, buffer + len / sizeof(VgmPlayer::sample_t));
     } catch (const std::exception& e) {
         std::cerr << "error: " << e.what() << std::endl;
         more = false;
