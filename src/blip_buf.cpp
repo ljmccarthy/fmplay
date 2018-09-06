@@ -9,9 +9,7 @@
 
 #include "blip_buf.hpp"
 
-#ifdef BLIP_ASSERT
 #include <cassert>
-#endif
 #include <climits>
 #include <cstring>
 #include <cstdlib>
@@ -93,7 +91,6 @@ enum { min_sample = -32768 };
     else if ( n < min_sample) n = min_sample;\
 	}
 
-#ifdef BLIP_ASSERT
 static void check_assumptions( void )
 {
 	int n;
@@ -115,14 +112,12 @@ static void check_assumptions( void )
 	assert( blip_max_ratio <= time_unit );
 	assert( blip_max_frame <= (fixed_t) -1 >> time_bits );
 }
-#endif
 
 blip_t* blip_new( int size )
 {
 	blip_t* m;
-#ifdef BLIP_ASSERT
+
 	assert( size >= 0 );
-#endif
   
 	m = (blip_t*) malloc( sizeof *m );
 
@@ -138,9 +133,7 @@ blip_t* blip_new( int size )
 		m->factor = time_unit / blip_max_ratio;
 		m->size   = size;
 		blip_clear( m );
-#ifdef BLIP_ASSERT
 		check_assumptions();
-#endif
   }
 	return m;
 }
@@ -163,12 +156,10 @@ void blip_set_rates( blip_t* m, double clock_rate, double sample_rate )
 {
 	double factor = time_unit * sample_rate / clock_rate;
 	m->factor = (fixed_t) factor;
-	
-#ifdef BLIP_ASSERT
+
 	/* Fails if clock_rate exceeds maximum, relative to sample_rate */
 	assert( 0 <= factor - m->factor && factor - m->factor < 1 );
-#endif
-  
+
 /* Avoid requiring math.h. Equivalent to
 	m->factor = (int) ceil( factor ) */
 	if ( m->factor < factor )
@@ -197,10 +188,8 @@ int blip_clocks_needed( const blip_t* m, int samples )
 {
 	fixed_t needed;
 
-#ifdef BLIP_ASSERT
 	/* Fails if buffer can't hold that many more samples */
 	assert( (samples >= 0) && (((m->offset >> time_bits) + samples) <= m->size) );
-#endif
 
   needed = (fixed_t) samples * time_unit;
 	if ( needed < m->offset )
@@ -213,10 +202,8 @@ void blip_end_frame( blip_t* m, unsigned t )
 {
 	m->offset += t * m->factor;
 
-#ifdef BLIP_ASSERT
 	/* Fails if buffer size was exceeded */
   assert( (m->offset >> time_bits) <= m->size );
-#endif
 }
 
 int blip_samples_avail( const blip_t* m )
@@ -240,14 +227,8 @@ static void remove_samples( blip_t* m, int count )
 
 int blip_read_samples( blip_t* m, short out [], int count)
 {
-#ifdef BLIP_ASSERT
 	assert( count >= 0 );
 
-	if ( count > (m->offset >> time_bits) )
-		count = m->offset >> time_bits;
-
-	if ( count )
-#endif
   {
 		buf_t const* in = m->buffer[0];
 		buf_t const* in2 = m->buffer[1];
@@ -292,18 +273,8 @@ int blip_read_samples( blip_t* m, short out [], int count)
 
 int blip_mix_samples( blip_t* m1, blip_t* m2, blip_t* m3, short out [], int count)
 {
-#ifdef BLIP_ASSERT
   assert( count >= 0 );
 
-  if ( count > (m1->offset >> time_bits) )
-    count = m1->offset >> time_bits;
-  if ( count > (m2->offset >> time_bits) )
-    count = m2->offset >> time_bits;
-  if ( count > (m3->offset >> time_bits) )
-    count = m3->offset >> time_bits;
-
-  if ( count )
-#endif
   {
     buf_t const* end;
     buf_t const* in[3];
@@ -425,10 +396,8 @@ void blip_add_delta( blip_t* m, unsigned time, int delta_l, int delta_r )
 
     int delta;
 
-#ifdef BLIP_ASSERT
     /* Fails if buffer size was exceeded */
     assert( pos <= m->size + end_frame_extra );
-#endif
 
     if (delta_l == delta_r)
     {
@@ -540,10 +509,8 @@ void blip_add_delta_fast( blip_t* m, unsigned time, int delta_l, int delta_r )
 
     int delta = delta_l * interp;
 
-#ifdef BLIP_ASSERT
     /* Fails if buffer size was exceeded */
     assert( pos <= m->size + end_frame_extra );
-#endif
 
     if (delta_l == delta_r)
     {
