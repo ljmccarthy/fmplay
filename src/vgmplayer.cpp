@@ -55,12 +55,12 @@ VgmPlayer::VgmPlayer(const char *filename)
 }
 
 bool
-VgmPlayer::play(stereo<int16_t> *out, stereo<int16_t> *end)
+VgmPlayer::play(sample_t *out, sample_t *end)
 {
     while (true) {
         while (!wait_pending) {
             if (play_pos >= vgm_end) {
-                std::fill(out, end, stereo<int16_t>{0, 0});
+                std::fill(out, end, sample_t{0, 0});
                 return false;
             }
             process_command();
