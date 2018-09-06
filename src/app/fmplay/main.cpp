@@ -19,9 +19,8 @@ sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
         retcode = 1;
     }
     if (!more) {
-        SDL_LockAudioDevice(device);
+        SDL::AudioDeviceLock lock(device);
         SDL_PauseAudioDevice(device, 1);
-        SDL_UnlockAudioDevice(device);
     }
 }
 
@@ -54,12 +53,11 @@ play_vgm(const char *filename)
 {
     VgmPlayer player(filename);
     device = open_audio_device(44100, sdl_audio_callback, &player);
-    SDL_LockAudioDevice(device);
+    SDL::AudioDeviceLock lock(device);
     SDL_PauseAudioDevice(device, 0);
     while (SDL_GetAudioDeviceStatus(device) == SDL_AUDIO_PLAYING) {
-        SDL_UnlockAudioDevice(device);
+        SDL::AudioDeviceUnlock unlock(device);
         SDL_Delay(100);
-        SDL_LockAudioDevice(device);
     }
 }
 
@@ -70,7 +68,7 @@ main(const int argc, const char *const *argv)
         std::cerr << "usage: " << argv[0] << " FILE.vgm" << std::endl;
         return 1;
     }
-    SDL sdl(SDL_INIT_AUDIO);
+    SDL::SDL sdl(SDL_INIT_AUDIO);
     try {
         play_vgm(argv[1]);
         return retcode;
