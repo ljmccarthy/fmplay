@@ -1,5 +1,5 @@
 #include <iostream>
-#include <SDL.h>
+#include "sdl.hpp"
 #include "vgmplayer.hpp"
 
 static SDL_AudioDeviceID device;
@@ -9,7 +9,7 @@ static void
 sdl_audio_callback(void *userdata, uint8_t *stream_bytes, int len)
 {
     auto player = reinterpret_cast<VgmPlayer *>(userdata);
-    auto buffer = reinterpret_cast<stereo<int16_t> *>(stream_bytes);
+    auto buffer = reinterpret_cast<typename VgmPlayer::sample_t *>(stream_bytes);
     bool more;
     try {
         more = player->play(buffer, buffer + len / 4);
@@ -70,13 +70,12 @@ main(const int argc, const char *const *argv)
         std::cerr << "usage: " << argv[0] << " FILE.vgm" << std::endl;
         return 1;
     }
-    SDL_Init(SDL_INIT_AUDIO);
+    SDL sdl(SDL_INIT_AUDIO);
     try {
         play_vgm(argv[1]);
+        return retcode;
     } catch (const std::exception& e) {
         std::cerr << "error: " << e.what() << std::endl;
-        retcode = 1;
+        return 1;
     }
-    SDL_Quit();
-    return retcode;
 }
